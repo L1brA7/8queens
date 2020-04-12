@@ -1,9 +1,12 @@
 ﻿#include <iostream>
 #include <tuple>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
 int quantity = 0;
+ofstream queens;
 
 void ss();
 void tab();
@@ -25,10 +28,12 @@ bool diag_check(bool **FIELD, int I, int J, int N, int M);
 int main() {
 	int N = 8;
 	int M = 8;
+	queens.open("queens.txt");
 	bool** FIELD = bool_mem_alloc(N, M);
 	fi_clear(FIELD, N, M);
 	create(FIELD, 0, 0, N, M);
 	cout << quantity << endl;
+	queens.close();
 	return 0;
 }
 
@@ -73,6 +78,16 @@ void create(bool **FIELD, int I, int J, int N, int M) {
 		if (checker(FIELD, N, M) == true) {
 			quantity++;
 			out(FIELD, N, M);
+			string line = "";
+			for (int i = 0; i < N; i++) {
+				for (int j = 0; j < M; j++) {
+					if (FIELD[i][j] == true) {
+						line += " | " + to_string(i + 1) + "/" + to_string(j + 1) + " | ";
+						break;
+					}
+				}
+			}
+			queens << line << endl;
 		}
 		return;
 	}
