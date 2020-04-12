@@ -9,16 +9,29 @@ void line();
 
 bool** bool_mem_alloc(int N, int M);
 tuple<int, int> NM();
-void SpotFI(bool **FIELD, int **queens, int s_line, int N, int M);
+void SpotFI(bool **FIELD, int I, int J, int N, int M);
+void cl_line(bool **FIELD, int line, int M);
+
+//true - чисто 
+//false - найдена угроза
+bool vert_check(bool **FIELD, int I, int J, int N);
+bool diag_check(bool **FIELD, int I, int J, int N, int M);
 
 int main() {
-
 	int N, M;
 	tie(N, M) = NM();
 	bool** FIELD = bool_mem_alloc(N, M);
-	int **queens = (int **)malloc(0 * sizeof(int));
-	//queens[0] = (int *)malloc(2 * sizeof(int));
-	SpotFI(FIELD, queens, 0, N, M);
+	FIELD[0][0] = true;
+	//cout << diag_check(FIELD, 5, 5, N, M);
+	SpotFI(FIELD, 1, 0, N, M);
+	ss();
+	for (int i = 0; i < N; i++) {
+		tab();
+		for (int j = 0; j < M; j++) {
+			printf("%2i", FIELD[i][j]);
+		}
+		ss();
+	}
 	return 0;
 }
 
@@ -38,6 +51,13 @@ bool** bool_mem_alloc(int N, int M) {
 	bool** ARR = new bool*[N];
 	for (int i = 0; i < N; i++)
 		ARR[i] = new bool[M];
+	
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			ARR[i][j] = false;
+		}
+	}
+	
 	return ARR;
 }
 
@@ -51,17 +71,71 @@ tuple<int, int> NM() {
 	return make_tuple(N, M);
 }
 
-void SpotFI(bool **FIELD, int **queens, int s_line, int N, int M) {
-	if (s_line == N) return;
-	queens = (int **)realloc(queens, (s_line + 1) * sizeof(int));
-	queens[s_line] = (int *)malloc(2 * sizeof(int));
-
-	for (int j = 0; j < M; j++) {
-		if () {
-			FIELD[s_line][j] = true;
-			queens[s_line][] =
+void SpotFI(bool **FIELD, int I, int J, int N, int M) {
+	if (I == N) {
+		cout << "FOUND" << endl;
+		return;
+	}
+	for (int j = J; j < M; j++) {
+		if (vert_check(FIELD, I, j, N)) {
+			if (diag_check(FIELD, I, j, N, M)) {
+				FIELD[I][j] = true;
+				SpotFI(FIELD, I + 1, 0, N, M);
+				break;
+			}
 		}
-		SpotFI(FIELD, queens, s_line + 1, N, M);
-		FIELD[s_line][j] = false;
+	}
+}
+
+bool vert_check(bool **FIELD, int I, int J, int N) {
+	for (int i = 0; i < N; i++) {
+		if (FIELD[i][J] == true)
+			return false;
+	}
+	return true;
+}
+
+bool diag_check(bool **FIELD, int I, int J, int N, int M) {
+	int j = 0;
+	//shrinking diags
+	if (I >= J) {
+		for (int i = I - J; i < N; i++) {
+			if (FIELD[i][j] == true && i != I && j != J) return false;
+			//FIELD[i][j] = true;
+			j++;
+		}
+	}
+	else {
+		j = J - I;
+		for (int i = 0; i < N; i++) {
+			if (FIELD[i][j] == true && i != I && j != J) return false;
+			//FIELD[i][j] = true;
+			j++;
+		}
+	}
+	
+	//growing diags
+	if (I + J < N)  {
+		j = 0;
+		for (int i = I + J; i >= 0; i--) { // 
+			if (FIELD[i][j] == true && i != I && j != J) return false;
+			//FIELD[i][j] = true;
+			j++;
+		}
+	}
+	else {
+		j = M;
+		for (int i = abs(J - I - 2 * (J - 4)); i < N; i++) {
+			if (FIELD[i][j] == true && i != I && j != J) return false;
+			//FIELD[i][j] = true;
+			j--;
+		}
+	}
+	return true;
+}
+
+void cl_line(bool **FIELD, int line, int M) {
+	for (int j = 0; j < M; j++) {
+		FIELD[line][j] = false;
 	}
 }
