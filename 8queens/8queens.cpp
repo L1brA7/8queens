@@ -23,13 +23,12 @@ bool vert_check(bool **FIELD, int I, int J, int M);
 bool diag_check(bool **FIELD, int I, int J, int N, int M);
 
 int main() {
-	int N, M;
-	tie(N, M) = NM();
+	int N = 8;
+	int M = 8;
 	bool** FIELD = bool_mem_alloc(N, M);
 	fi_clear(FIELD, N, M);
 	create(FIELD, 0, 0, N, M);
 	cout << quantity << endl;
-	//out(FIELD, N, M);
 	return 0;
 }
 
