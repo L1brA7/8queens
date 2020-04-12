@@ -3,35 +3,33 @@
 
 using namespace std;
 
+int quantity = 0;
+
 void ss();
 void tab();
 void line();
 
 bool** bool_mem_alloc(int N, int M);
 tuple<int, int> NM();
-void SpotFI(bool **FIELD, int I, int J, int N, int M);
+void fi_clear(bool **FIELD, int N, int M);
+void out(bool **FIELD, int N, int M);
+bool checker(bool **FIELD, int N, int M);
+void create(bool **FIELD, int I, int J, int N, int M);
 void cl_line(bool **FIELD, int line, int M);
 
-//true - чисто 
+//true - чисто
 //false - найдена угроза
-bool vert_check(bool **FIELD, int I, int J, int N);
+bool vert_check(bool **FIELD, int I, int J, int M);
 bool diag_check(bool **FIELD, int I, int J, int N, int M);
 
 int main() {
 	int N, M;
 	tie(N, M) = NM();
 	bool** FIELD = bool_mem_alloc(N, M);
-	FIELD[0][0] = true;
-	//cout << diag_check(FIELD, 5, 5, N, M);
-	SpotFI(FIELD, 1, 0, N, M);
-	ss();
-	for (int i = 0; i < N; i++) {
-		tab();
-		for (int j = 0; j < M; j++) {
-			printf("%2i", FIELD[i][j]);
-		}
-		ss();
-	}
+	fi_clear(FIELD, N, M);
+	create(FIELD, 0, 0, N, M);
+	cout << quantity << endl;
+	//out(FIELD, N, M);
 	return 0;
 }
 
@@ -44,7 +42,7 @@ void tab() {
 }
 
 void line() {
-	printf("-------------------------------------------------------------------------------------------------\n\n");
+	printf("-------------------------------------------------------------------------------------------------");
 }
 
 bool** bool_mem_alloc(int N, int M) {
@@ -71,25 +69,24 @@ tuple<int, int> NM() {
 	return make_tuple(N, M);
 }
 
-void SpotFI(bool **FIELD, int I, int J, int N, int M) {
+void create(bool **FIELD, int I, int J, int N, int M) {
 	if (I == N) {
-		cout << "FOUND" << endl;
+		if (checker(FIELD, N, M) == true) {
+			quantity++;
+			out(FIELD, N, M);
+		}
 		return;
 	}
-	for (int j = J; j < M; j++) {
-		if (vert_check(FIELD, I, j, N)) {
-			if (diag_check(FIELD, I, j, N, M)) {
-				FIELD[I][j] = true;
-				SpotFI(FIELD, I + 1, 0, N, M);
-				break;
-			}
-		}
+	for (int j = 0; j < M; j++) {
+		cl_line(FIELD, I, M);
+		FIELD[I][j] = true;
+		create(FIELD, I + 1, J, N, M);
 	}
 }
 
-bool vert_check(bool **FIELD, int I, int J, int N) {
-	for (int i = 0; i < N; i++) {
-		if (FIELD[i][J] == true)
+bool vert_check(bool **FIELD, int I, int J, int M) {
+	for (int i = 0; i < M; i++) {
+		if (FIELD[i][J] == true && i != I)
 			return false;
 	}
 	return true;
@@ -129,6 +126,39 @@ bool diag_check(bool **FIELD, int I, int J, int N, int M) {
 			if (FIELD[i][j] == true && i != I && j != J) return false;
 			//FIELD[i][j] = true;
 			j--;
+		}
+	}
+	return true;
+}
+
+void fi_clear(bool **FIELD, int N, int M) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			FIELD[i][j] = false;
+		}
+	}
+}
+
+void out(bool **FIELD, int N, int M) {
+	ss();
+		for (int i = 0; i < N; i++) {
+			tab();
+			for (int j = 0; j < M; j++) {
+				printf("%2i", FIELD[i][j]);
+			}
+			ss();
+		}
+}
+
+bool checker (bool **FIELD, int N, int M) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (FIELD[i][j] == true) {
+				if (vert_check(FIELD, i, j, N) == false || diag_check(FIELD, i, j, N, M) == false) {
+					//cout << "LuL\n";
+					return false;	
+				}
+			}
 		}
 	}
 	return true;
